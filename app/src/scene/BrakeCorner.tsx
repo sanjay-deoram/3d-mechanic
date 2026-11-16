@@ -1,4 +1,4 @@
-import { memo, useContext, useMemo, type ReactNode } from 'react'
+import { memo, useMemo } from 'react'
 import {
   CatmullRomCurve3,
   DoubleSide,
@@ -14,23 +14,7 @@ import {
 } from 'three'
 import type { Vec3 } from '../types'
 import { G, LUG_COUNT, lugCenter } from './geometry'
-import { RegistryContext } from './registry'
-
-/** A named, independently animated piece. Its meshes are placed in world coordinates. */
-function Part({ id, children }: { id: string; children: ReactNode }) {
-  const registry = useContext(RegistryContext)
-  return (
-    <group
-      matrixAutoUpdate={false}
-      ref={(g) => {
-        if (g) registry.set(id, g)
-        else registry.delete(id)
-      }}
-    >
-      {children}
-    </group>
-  )
-}
+import { Part } from './Part'
 
 interface Look {
   color: string

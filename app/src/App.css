@@ -60,7 +60,39 @@
 }
 
 .pill.job {
-  padding: 7px 16px;
+  position: relative;
+  padding: 0;
+}
+
+.pill.job select {
+  appearance: none;
+  max-width: 100%;
+  padding: 7px 36px 7px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.pill.job svg {
+  position: absolute;
+  right: 13px;
+  pointer-events: none;
+}
+
+.credit {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.credit a {
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .work {
@@ -446,10 +478,7 @@ h2 {
   }
 
   .pill.job {
-    display: block;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .top {

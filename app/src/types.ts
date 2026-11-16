@@ -61,7 +61,17 @@ export interface Step {
   actions: Action[]
 }
 
+export type SceneKind = 'brakeCorner' | 'airBox'
+
 export interface Procedure {
+  /** Used in the `?guide=` link. */
+  id: string
+  /** Which 3D model the steps animate. */
+  scene: SceneKind
+  /** Part ids drawn in grey so they read as surroundings. */
+  background: string[]
+  /** Where the facts came from, shown on the overview. */
+  credit?: { text: string; url: string }
   vehicle: string
   title: string
   time: string

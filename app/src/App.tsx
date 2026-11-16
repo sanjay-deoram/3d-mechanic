@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import { civicSi2013FrontPads as procedure } from './data/civicSi2013FrontPads'
+import { civic2012AirFilter } from './data/civic2012AirFilter'
+import { civicSi2013FrontPads } from './data/civicSi2013FrontPads'
 import { Stage, type LabelElements } from './scene/Stage'
-import type { Spec, Step } from './types'
+import type { Procedure, Spec, Step } from './types'
+
+const GUIDES: Procedure[] = [civicSi2013FrontPads, civic2012AirFilter]
 
 const ICON = {
   play: <path d="M8 5.5v13l10.5-6.5z" />,
@@ -45,7 +48,7 @@ function SpecChip({ spec }: { spec: Spec }) {
   )
 }
 
-function Kit() {
+function Kit({ procedure }: { procedure: Procedure }) {
   return (
     <aside className="kit">
       <p className="meta">
@@ -81,12 +84,20 @@ function Kit() {
           </li>
         ))}
       </ul>
+      {procedure.credit && (
+        <p className="credit">
+          {procedure.credit.text}{' '}
+          <a href={procedure.credit.url} target="_blank" rel="noreferrer">
+            Open the guide
+          </a>
+        </p>
+      )}
     </aside>
   )
 }
 
 /** One label per distinct part name in the step, pinned to the first part with that name. */
-function labelsFor(step: Step) {
+function labelsFor(procedure: Procedure, step: Step) {
   const byName = new Map<string, { part: string; name: string; count: number }>()
   for (const part of step.highlight ?? []) {
     const name = procedure.partNames[part]
@@ -98,14 +109,18 @@ function labelsFor(step: Step) {
   return [...byName.values()]
 }
 
-/** Lets a link open the guide at a given step, e.g. `?step=7`. */
-function initialStep() {
-  const n = Number(new URLSearchParams(window.location.search).get('step'))
-  return Number.isInteger(n) && n >= 0 && n < procedure.steps.length ? n : 0
+/** Lets a link open a guide at a given step, e.g. `?guide=engine-air-filter&step=4`. */
+function initial() {
+  const query = new URLSearchParams(window.location.search)
+  const procedure = GUIDES.find((g) => g.id === query.get('guide')) ?? GUIDES[0]
+  const n = Number(query.get('step'))
+  return { procedure, step: Number.isInteger(n) && n >= 0 && n < procedure.steps.length ? n : 0 }
 }
 
 export default function App() {
-  const [stepIndex, setStepIndex] = useState(initialStep)
+  const [start] = useState(initial)
+  const [procedure, setProcedure] = useState(start.procedure)
+  const [stepIndex, setStepIndex] = useState(start.step)
   const [playNonce, setPlayNonce] = useState(0)
   const [viewNonce, setViewNonce] = useState(0)
   const [closeUp, setCloseUp] = useState(true)
@@ -117,7 +132,7 @@ export default function App() {
   const step = steps[stepIndex]
   const last = steps.length - 1
   const overview = stepIndex === 0
-  const labels = useMemo(() => (showLabels ? labelsFor(step) : []), [showLabels, step])
+  const labels = useMemo(() => (showLabels ? labelsFor(procedure, step) : []), [showLabels, procedure, step])
 
   const go = useCallback((i: number) => setStepIndex(Math.min(last, Math.max(0, i))), [last])
 
@@ -152,7 +167,25 @@ export default function App() {
             3D Mechanic
           </span>
           <strong>{procedure.vehicle}</strong>
-          <span className="pill job">{procedure.title}</span>
+          <label className="pill job">
+            <select
+              aria-label="Guide"
+              value={procedure.id}
+              onChange={(e) => {
+                setProcedure(GUIDES.find((g) => g.id === e.target.value) ?? GUIDES[0])
+                setStepIndex(0)
+              }}
+            >
+              {GUIDES.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.title}
+                </option>
+              ))}
+            </select>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </label>
         </header>
 
         <div className="work">
@@ -206,7 +239,7 @@ export default function App() {
             )}
             <p className="hint">drag to rotate · scroll or pinch to zoom</p>
           </section>
-          {overview && <Kit />}
+          {overview && <Kit procedure={procedure} />}
         </div>
 
         <section className="text">

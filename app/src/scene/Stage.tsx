@@ -20,6 +20,7 @@ import {
 } from 'three'
 import { computeState, type SceneState } from '../engine'
 import type { Procedure, ToolKind } from '../types'
+import { AirBox } from './AirBox'
 import { BrakeCorner } from './BrakeCorner'
 import { RegistryContext, type PartRegistry } from './registry'
 import { SPINNER, Tool } from './Tool'
@@ -29,8 +30,7 @@ const INK = '#141414'
 const FAINT = '#b3b3ad'
 const ACCENT = new Color('#e6502e')
 const X_AXIS = new Vector3(1, 0, 0)
-/** Parts drawn in grey so they read as background. */
-const BACKGROUND_PARTS = new Set(['chassis'])
+const MODEL = { brakeCorner: BrakeCorner, airBox: AirBox }
 /** Outline weight in CSS pixels. */
 const OUTLINE_PX = 1.3
 /** Matches the old 38° perspective view, so step camera distances still frame the same area. */
@@ -139,11 +139,12 @@ function Scene({ procedure, stepIndex, playNonce, viewNonce, onProgress, labels,
   const point = useMemo(() => new Vector3(), [])
 
   const step = procedure.steps[stepIndex]
+  const Model = MODEL[procedure.scene]
 
   useLayoutEffect(() => {
     const all: Drawn[] = []
     for (const [id, group] of registry) {
-      const d = draw(group, px, BACKGROUND_PARTS.has(id) ? FAINT : INK)
+      const d = draw(group, px, procedure.background.includes(id) ? FAINT : INK)
       drawn.set(id, d)
       all.push(d)
     }
@@ -155,7 +156,7 @@ function Scene({ procedure, stepIndex, playNonce, viewNonce, onProgress, labels,
       all.forEach(erase)
       drawn.clear()
     }
-  }, [registry, drawn, px])
+  }, [registry, drawn, px, procedure])
 
   useEffect(() => {
     clock.current = 0
@@ -270,7 +271,7 @@ function Scene({ procedure, stepIndex, playNonce, viewNonce, onProgress, labels,
 
   return (
     <RegistryContext.Provider value={registry}>
-      <BrakeCorner />
+      <Model />
       {TOOL_KINDS.map((kind) => (
         <Tool
           key={kind}
@@ -301,7 +302,7 @@ export function Stage(props: StageProps) {
   const start = props.procedure.steps[0].camera.pos
   return (
     <Canvas flat orthographic camera={{ position: start, zoom: 60, near: -200, far: 400 }} dpr={[1, 2]}>
-      <Scene {...props} />
+      <Scene key={props.procedure.id} {...props} />
     </Canvas>
   )
 }

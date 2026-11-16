@@ -66,6 +66,9 @@ const newPadsIn: Action[] = [
 const wornBoltCenter: Vec3 = [lowerBoltCenter[0] - WEAR, lowerBoltCenter[1], lowerBoltCenter[2]]
 
 export const civicSi2013FrontPads: Procedure = {
+  id: 'front-brake-pads',
+  scene: 'brakeCorner',
+  background: ['chassis'],
   vehicle: '2013 Honda Civic Si Sedan',
   title: 'Front brake pad replacement',
   time: '1–2 hours',
