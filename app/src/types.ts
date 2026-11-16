@@ -53,6 +53,10 @@ export interface Step {
   tools?: string[]
   specs?: Spec[]
   highlight?: string[]
+  /** Parts to name without highlighting them, as landmarks. */
+  landmarks?: string[]
+  /** Label text for this step only, by part id. An empty string hides that part's label. */
+  names?: Record<string, string>
   camera: { pos: Vec3; target: Vec3 }
   /** Close-up shown in the round inset: what to look at, how wide (scene units), and a caption. */
   detail?: { target: Vec3; span: number; label: string }

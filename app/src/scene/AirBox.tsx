@@ -117,29 +117,99 @@ function Clip({ at, turn }: { at: Vec3; turn: number }) {
   )
 }
 
-/** The neighbours in the engine bay, so you can find the box. */
-function Bay() {
+/**
+ * Flat panel hinged along X at `hinge` and tilted up by `angle` radians.
+ * `toward` is 1 if it reaches toward the front of the car from its hinge, -1 if toward the back.
+ */
+function Panel({
+  hinge,
+  x,
+  length,
+  angle,
+  toward,
+}: {
+  hinge: Vec3
+  x: [number, number]
+  length: number
+  angle: number
+  toward: 1 | -1
+}) {
+  return (
+    <group position={hinge} rotation={[-angle * toward, 0, 0]}>
+      <mesh position={[(x[0] + x[1]) / 2, 0, (toward * length) / 2]}>
+        <boxGeometry args={[x[1] - x[0], 0.08, length]} />
+        <meshBasicMaterial color={WHITE} />
+      </mesh>
+    </group>
+  )
+}
+
+const LEFT = -8.3
+const RIGHT = 5.3
+const FIREWALL = -2.8
+const NOSE = 5.0
+
+/** Front of the car around the engine bay: fenders, firewall, raised hood, bumper and headlights. */
+function Body() {
+  return (
+    <>
+      <Block a={[LEFT, -0.5, FIREWALL]} b={[LEFT + 0.5, 0.5, NOSE + 0.6]} />
+      <Block a={[RIGHT - 0.5, -0.5, FIREWALL]} b={[RIGHT, 0.5, NOSE + 0.6]} />
+      <Block a={[LEFT, -0.8, FIREWALL - 0.5]} b={[RIGHT, 0.9, FIREWALL]} />
+      {/* Radiator support across the front, where the prop rod rests */}
+      <Block a={[LEFT + 0.5, -0.45, NOSE]} b={[RIGHT - 0.5, -0.12, NOSE + 0.45]} />
+      {/* Bumper, grille and headlights */}
+      <Block a={[LEFT, -2.4, NOSE + 0.6]} b={[RIGHT, -0.5, NOSE + 1.3]} />
+      <Block a={[-4.6, -1.3, NOSE + 1.3]} b={[1.6, -0.75, NOSE + 1.36]} />
+      <Block a={[LEFT, -0.5, NOSE + 0.6]} b={[LEFT + 2.6, 0.3, NOSE + 1.2]} color={PLASTIC} />
+      <Block a={[RIGHT - 2.6, -0.5, NOSE + 0.6]} b={[RIGHT, 0.3, NOSE + 1.2]} color={PLASTIC} />
+      {/* Open hood and the windshield behind it */}
+      <Panel hinge={[0, 0.9, FIREWALL]} x={[LEFT, RIGHT]} length={8.2} angle={1.05} toward={1} />
+      <Panel hinge={[0, 0.9, FIREWALL - 0.5]} x={[LEFT + 0.6, RIGHT - 0.6]} length={4.5} angle={0.55} toward={-1} />
+    </>
+  )
+}
+
+function Engine() {
   const rings = [-2.3, -2.16, -2.02, -1.88]
   return (
     <>
-      {/* Engine valve cover */}
-      <Block a={[-5.4, -1.0, -1.6]} b={[-2.5, 0.25, 1.3]} />
-      <Block a={[-5.0, 0.25, -1.2]} b={[-2.9, 0.4, 0.9]} />
-      <CylY y={[0.4, 0.52]} x={-4.4} z={0.2} r={0.22} />
+      <Block a={[-6.6, -1.4, -1.7]} b={[-2.5, 0.2, 3.4]} />
+      <Block a={[-6.2, 0.2, -1.2]} b={[-2.9, 0.38, 2.6]} />
+      <CylY y={[0.38, 0.52]} x={-4.6} z={1.6} r={0.24} />
       {/* Hose from the air box to the engine */}
       <CylX x={[-2.5, -1.74]} y={0.52} z={-0.3} r={0.33} />
       {rings.map((x) => (
         <CylX key={x} x={[x - 0.04, x + 0.04]} y={0.52} z={-0.3} r={0.39} />
       ))}
-      {/* Battery */}
-      <Block a={[2.1, -1.2, -0.1]} b={[4.3, 0.3, 1.7]} />
-      <CylY y={[0.3, 0.45]} x={2.5} z={1.3} r={0.1} />
-      <CylY y={[0.3, 0.45]} x={3.9} z={1.3} r={0.1} />
-      {/* Brake fluid reservoir */}
-      <CylY y={[-0.3, 0.5]} x={2.2} z={-1.9} r={0.42} />
-      <CylY y={[0.5, 0.62]} x={2.2} z={-1.9} r={0.3} />
-      {/* Radiator support across the front */}
-      <Block a={[-5.6, -0.45, 2.6]} b={[4.6, -0.12, 3.05]} />
+    </>
+  )
+}
+
+function Battery() {
+  return (
+    <>
+      <Block a={[1.2, -1.7, 1.9]} b={[3.7, -0.15, 3.9]} />
+      <CylY y={[-0.15, 0]} x={1.6} z={2.3} r={0.11} />
+      <CylY y={[-0.15, 0]} x={3.3} z={2.3} r={0.11} />
+    </>
+  )
+}
+
+function FuseBox() {
+  return (
+    <>
+      <Block a={[2.1, -1.0, -1.3]} b={[4.5, 0.2, 1.2]} />
+      <Block a={[2.2, 0.2, -1.2]} b={[4.4, 0.32, 1.1]} color={PLASTIC} />
+    </>
+  )
+}
+
+function Reservoir() {
+  return (
+    <>
+      <CylY y={[-0.4, 0.45]} x={1.1} z={-2.05} r={0.45} />
+      <CylY y={[0.45, 0.6]} x={1.1} z={-2.05} r={0.3} color="#f2c230" />
     </>
   )
 }
@@ -148,8 +218,20 @@ function Bay() {
 export const AirBox = memo(function AirBox() {
   return (
     <>
-      <Part id="bay">
-        <Bay />
+      <Part id="body">
+        <Body />
+      </Part>
+      <Part id="engine">
+        <Engine />
+      </Part>
+      <Part id="battery">
+        <Battery />
+      </Part>
+      <Part id="fuseBox">
+        <FuseBox />
+      </Part>
+      <Part id="reservoir">
+        <Reservoir />
       </Part>
       <Part id="propRod">
         <CylX x={[rodPivot[0], rodPivot[0] + 3.8]} y={rodPivot[1]} z={rodPivot[2]} r={0.035} />

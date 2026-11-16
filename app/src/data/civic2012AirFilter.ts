@@ -5,10 +5,14 @@ const CLIP_IDS = CLIPS.map((_, i) => `clip${i}`)
 const Z_AXIS: Vec3 = [0, 0, 1]
 
 const VIEW = {
-  bay: { pos: [4.5, 6, 9] as Vec3, target: [-0.6, -0.2, 0.6] as Vec3 },
+  car: { pos: [1.5, 12.5, 17] as Vec3, target: [-1.5, 0.8, 1.6] as Vec3 },
+  bay: { pos: [3.5, 7, 8.5] as Vec3, target: [0.2, -0.2, 0.6] as Vec3 },
   box: { pos: [3.6, 3.6, 5.2] as Vec3, target: [0, -0.05, 0.1] as Vec3 },
   open: { pos: [4.6, 3.4, 4.6] as Vec3, target: [0.2, 0.3, 0.1] as Vec3 },
 }
+
+/** On the wide views the whole box gets one label saying what is inside. */
+const HERE = { cover: 'Air box · filter is inside', lower: '' }
 
 /** Direction the filter slides once it has been tipped up, clear of the open cover. */
 const tilt = (A.filterTilt * Math.PI) / 180
@@ -18,7 +22,7 @@ const slideIn: Vec3 = [-slideOut[0], -slideOut[1], -slideOut[2]]
 export const civic2012AirFilter: Procedure = {
   id: 'engine-air-filter',
   scene: 'airBox',
-  background: ['bay'],
+  background: ['body', 'engine', 'battery', 'fuseBox', 'reservoir'],
   credit: {
     text: 'Steps follow the iFixit guide “2012–2015 Honda Civic Air Filter Replacement”.',
     url: 'https://www.ifixit.com/Guide/2012+2013+2014+2015+Honda+Civic+Air+Filter+Replacement/40403',
@@ -47,6 +51,10 @@ export const civic2012AirFilter: Procedure = {
     filterOld: 'Old filter',
     filterNew: 'New filter',
     propRod: 'Hood prop rod',
+    engine: 'Engine',
+    battery: 'Battery',
+    fuseBox: 'Fuse box',
+    reservoir: 'Brake fluid',
   },
   setup: [
     { type: 'pivot', parts: ['filterNew'], pivot: filterHinge, axis: Z_AXIS, angle: A.filterTilt },
@@ -57,16 +65,19 @@ export const civic2012AirFilter: Procedure = {
     {
       id: 'overview',
       title: 'Before you start',
+      highlight: ['cover', 'lower'],
+      names: HERE,
+      landmarks: ['engine', 'battery'],
       body: 'The engine air filter sits in a black plastic box next to the engine. You will unclip the box, lift its cover, swap the filter and clip it shut again. Do it with the engine off and cool.',
       notes: [{ kind: 'tip', text: 'This is for the 1.8 L engine. The Civic Si has a different air box.' }],
-      camera: VIEW.bay,
+      camera: VIEW.car,
       actions: [],
     },
     {
       id: 'hood-release',
       title: 'Release the hood',
       body: 'Inside the car, find the hood release lever below the dashboard on the driver side and pull it toward you until you hear a click. At the front of the car the hood will have popped up slightly. Reach under its front edge, push the safety catch to the left and lift the hood.',
-      camera: VIEW.bay,
+      camera: VIEW.car,
       actions: [],
     },
     {
@@ -75,16 +86,19 @@ export const civic2012AirFilter: Procedure = {
       body: 'The prop rod lies along the ledge in front of the radiator. Lift it and put its end into the hole on the underside of the hood.',
       notes: [{ kind: 'warning', text: 'Make sure the rod is seated in the hole before you let go of the hood.' }],
       highlight: ['propRod'],
-      camera: VIEW.bay,
+      camera: VIEW.car,
       duration: 2.5,
       actions: [{ type: 'pivot', parts: ['propRod'], pivot: rodPivot, axis: Z_AXIS, angle: 62 }],
     },
     {
       id: 'locate',
       title: 'Find the air box',
-      body: 'Standing at the front of the car, the air box is the black plastic box to the right of the engine valve cover, between the engine and the battery.',
+      body: 'Stand at the front of the car. The air box is the black plastic box on the right-hand side of the engine bay, toward the back. It sits between the engine on its left and the fuse box on its right, just behind the battery. The brake fluid reservoir with the yellow cap is right behind it.',
+      notes: [{ kind: 'tip', text: 'A thick ribbed rubber hose runs from the top of the box across to the engine. Follow that hose and you have found it.' }],
       highlight: ['cover', 'lower'],
-      camera: VIEW.bay,
+      landmarks: ['engine', 'battery', 'fuseBox', 'reservoir'],
+      names: HERE,
+      camera: VIEW.car,
       actions: [],
     },
     {
@@ -187,7 +201,7 @@ export const civic2012AirFilter: Procedure = {
       title: 'Close the hood',
       body: 'Hold the hood, lower the prop rod back into its clip on the ledge, then lower the hood and press it shut until it latches.',
       highlight: ['propRod'],
-      camera: VIEW.bay,
+      camera: VIEW.car,
       duration: 2.5,
       actions: [{ type: 'pivot', parts: ['propRod'], pivot: rodPivot, axis: Z_AXIS, angle: -62 }],
     },

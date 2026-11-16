@@ -96,16 +96,22 @@ function Kit({ procedure }: { procedure: Procedure }) {
   )
 }
 
-/** One label per distinct part name in the step, pinned to the first part with that name. */
+/**
+ * One label per distinct part name in the step, pinned to the first part with that name.
+ * Highlighted parts stack upward so close neighbours do not cover each other; landmarks sit low.
+ */
 function labelsFor(procedure: Procedure, step: Step) {
-  const byName = new Map<string, { part: string; name: string; count: number }>()
-  for (const part of step.highlight ?? []) {
-    const name = procedure.partNames[part]
-    if (!name) continue
+  const byName = new Map<string, { part: string; name: string; count: number; lift: number; landmark: boolean }>()
+  let lift = 0
+  const add = (part: string, landmark: boolean) => {
+    const name = step.names?.[part] ?? procedure.partNames[part]
+    if (!name) return
     const seen = byName.get(name)
     if (seen) seen.count++
-    else byName.set(name, { part, name, count: 1 })
+    else byName.set(name, { part, name, count: 1, lift: landmark ? 0 : lift++, landmark })
   }
+  step.highlight?.forEach((part) => add(part, false))
+  step.landmarks?.forEach((part) => add(part, true))
   return [...byName.values()]
 }
 
@@ -199,10 +205,10 @@ export default function App() {
               labels={labelEls}
             />
             <div className="labels">
-              {labels.map((l, i) => (
+              {labels.map((l) => (
                 <span
                   key={l.part}
-                  className="label"
+                  className={l.landmark ? 'label landmark' : 'label'}
                   ref={(el) => {
                     labelEls.current[l.part] = el
                     return () => {
@@ -210,7 +216,7 @@ export default function App() {
                     }
                   }}
                 >
-                  <span className="chip" style={{ bottom: 22 + i * 30 }}>
+                  <span className="chip" style={{ bottom: 22 + l.lift * 30 }}>
                     <i />
                     {l.count > 1 && <b>{l.count}×</b>}
                     {l.name}

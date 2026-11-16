@@ -34,4 +34,4 @@ export const coverHinge: Vec3 = [-A.halfX, 0, 0]
 /** The filter tips up about its engine-side edge before it slides out. */
 export const filterHinge: Vec3 = [-A.halfX + 0.1, -0.1, 0]
 /** Hood prop rod pivots at this end, on the radiator support. */
-export const rodPivot: Vec3 = [-5.3, -0.05, 2.8]
+export const rodPivot: Vec3 = [-7.2, -0.05, 5.22]

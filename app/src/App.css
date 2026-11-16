@@ -215,6 +215,24 @@
   border-left: 1px solid var(--ink);
 }
 
+.label:not(.landmark) {
+  z-index: 1;
+}
+
+.label.landmark::before {
+  border-color: var(--muted);
+}
+
+.label.landmark .chip {
+  border-color: var(--faint);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.label.landmark .chip i {
+  background: var(--faint);
+}
+
 .label .chip {
   position: absolute;
   left: 0;
@@ -505,6 +523,15 @@ h2 {
   }
 
   .hint {
+    display: none;
+  }
+
+  .label.landmark .chip {
+    padding: 1px 6px 1px 5px;
+    font-size: 10px;
+  }
+
+  .label.landmark .chip i {
     display: none;
   }
 
