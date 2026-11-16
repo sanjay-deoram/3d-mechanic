@@ -5,7 +5,7 @@ const CLIP_IDS = CLIPS.map((_, i) => `clip${i}`)
 const Z_AXIS: Vec3 = [0, 0, 1]
 
 const VIEW = {
-  car: { pos: [1.5, 12.5, 17] as Vec3, target: [-1.5, 0.8, 1.6] as Vec3 },
+  car: { pos: [-0.3, 13, 17.5] as Vec3, target: [-2.9, 0.8, 2.0] as Vec3 },
   bay: { pos: [3.5, 7, 8.5] as Vec3, target: [0.2, -0.2, 0.6] as Vec3 },
   box: { pos: [3.6, 3.6, 5.2] as Vec3, target: [0, -0.05, 0.1] as Vec3 },
   open: { pos: [4.6, 3.4, 4.6] as Vec3, target: [0.2, 0.3, 0.1] as Vec3 },
@@ -22,7 +22,7 @@ const slideIn: Vec3 = [-slideOut[0], -slideOut[1], -slideOut[2]]
 export const civic2012AirFilter: Procedure = {
   id: 'engine-air-filter',
   scene: 'airBox',
-  background: ['body', 'engine', 'battery', 'fuseBox', 'reservoir'],
+  background: ['body', 'engine', 'battery', 'fuseBox', 'reservoir', 'washer'],
   credit: {
     text: 'Steps follow the iFixit guide “2012–2015 Honda Civic Air Filter Replacement”.',
     url: 'https://www.ifixit.com/Guide/2012+2013+2014+2015+Honda+Civic+Air+Filter+Replacement/40403',
@@ -55,6 +55,7 @@ export const civic2012AirFilter: Procedure = {
     battery: 'Battery',
     fuseBox: 'Fuse box',
     reservoir: 'Brake fluid',
+    washer: 'Washer fluid',
   },
   setup: [
     { type: 'pivot', parts: ['filterNew'], pivot: filterHinge, axis: Z_AXIS, angle: A.filterTilt },
@@ -93,10 +94,10 @@ export const civic2012AirFilter: Procedure = {
     {
       id: 'locate',
       title: 'Find the air box',
-      body: 'Stand at the front of the car. The air box is the black plastic box on the right-hand side of the engine bay, toward the back. It sits between the engine on its left and the fuse box on its right, just behind the battery. The brake fluid reservoir with the yellow cap is right behind it.',
+      body: 'Stand at the front of the car. The air box is the black plastic box on the right-hand side of the engine bay, toward the back. It sits between the engine cover on its left and the fuse box on its right, directly behind the battery. The brake fluid reservoir with the yellow cap is just behind it, against the back wall.',
       notes: [{ kind: 'tip', text: 'A thick ribbed rubber hose runs from the top of the box across to the engine. Follow that hose and you have found it.' }],
       highlight: ['cover', 'lower'],
-      landmarks: ['engine', 'battery', 'fuseBox', 'reservoir'],
+      landmarks: ['engine', 'battery', 'fuseBox', 'reservoir', 'washer'],
       names: HERE,
       camera: VIEW.car,
       actions: [],

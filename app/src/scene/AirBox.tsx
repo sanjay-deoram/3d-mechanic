@@ -62,7 +62,7 @@ function Lower() {
       ))}
       <Block a={[-1.3, -0.52, Z]} b={[1.3, -0.47, Z + 0.07]} color={PLASTIC} />
       {/* Fresh-air inlet running forward to the grille */}
-      <Block a={[-0.5, -0.95, Z]} b={[0.35, -0.55, 2.55]} color={PLASTIC} />
+      <Block a={[-1.3, -0.95, Z]} b={[-0.5, -0.5, 3.3]} color={PLASTIC} />
     </>
   )
 }
@@ -144,39 +144,68 @@ function Panel({
   )
 }
 
-const LEFT = -8.3
-const RIGHT = 5.3
+const LEFT = -9.9
+const RIGHT = 4.1
 const FIREWALL = -2.8
 const NOSE = 5.0
 
-/** Front of the car around the engine bay: fenders, firewall, raised hood, bumper and headlights. */
+function CylZ({ z, x, y, r, color = WHITE }: { z: [number, number]; x: number; y: number; r: number; color?: string }) {
+  return (
+    <mesh position={[x, y, (z[0] + z[1]) / 2]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[r, r, Math.abs(z[1] - z[0]), 28]} />
+      <meshBasicMaterial color={color} />
+    </mesh>
+  )
+}
+
+/**
+ * Front of the car around the engine bay, laid out from a photo of a 2012-2015 Civic:
+ * fenders, cowl with wipers, raised hood, radiator support, front cover, grille and headlights.
+ */
 function Body() {
+  const mid = (LEFT + RIGHT) / 2
   return (
     <>
-      <Block a={[LEFT, -0.5, FIREWALL]} b={[LEFT + 0.5, 0.5, NOSE + 0.6]} />
-      <Block a={[RIGHT - 0.5, -0.5, FIREWALL]} b={[RIGHT, 0.5, NOSE + 0.6]} />
-      <Block a={[LEFT, -0.8, FIREWALL - 0.5]} b={[RIGHT, 0.9, FIREWALL]} />
-      {/* Radiator support across the front, where the prop rod rests */}
-      <Block a={[LEFT + 0.5, -0.45, NOSE]} b={[RIGHT - 0.5, -0.12, NOSE + 0.45]} />
+      <Block a={[LEFT, -0.5, FIREWALL]} b={[LEFT + 0.5, 0.5, NOSE + 0.5]} />
+      <Block a={[RIGHT - 0.5, -0.5, FIREWALL]} b={[RIGHT, 0.5, NOSE + 0.5]} />
+      {/* Cowl under the windshield, with the two wipers parked on it */}
+      <Block a={[LEFT, -0.8, FIREWALL - 0.9]} b={[RIGHT, 0.9, FIREWALL]} />
+      <Block a={[mid - 5.2, 0.9, FIREWALL - 0.5]} b={[mid - 0.2, 0.97, FIREWALL - 0.38]} color={PLASTIC} />
+      <Block a={[mid + 0.4, 0.9, FIREWALL - 0.5]} b={[mid + 5.0, 0.97, FIREWALL - 0.38]} color={PLASTIC} />
+      {/* Strut tower in the rear left corner */}
+      <CylY y={[-0.5, 0.35]} x={LEFT + 1.4} z={FIREWALL + 1.0} r={0.75} />
+      {/* Radiator support with the hood latch, where the prop rod rests */}
+      <Block a={[LEFT + 0.5, -0.45, NOSE]} b={[RIGHT - 0.5, -0.12, NOSE + 0.5]} />
+      <Block a={[mid - 0.25, -0.12, NOSE + 0.1]} b={[mid + 0.25, 0.05, NOSE + 0.4]} color={PLASTIC} />
+      {/* Plastic cover over the radiator, with the radiator cap */}
+      <Block a={[LEFT + 1.6, -0.6, NOSE + 0.5]} b={[RIGHT - 1.6, -0.3, NOSE + 1.4]} color={PLASTIC} />
+      <CylY y={[-0.3, -0.18]} x={mid + 2.0} z={NOSE + 0.85} r={0.2} />
       {/* Bumper, grille and headlights */}
-      <Block a={[LEFT, -2.4, NOSE + 0.6]} b={[RIGHT, -0.5, NOSE + 1.3]} />
-      <Block a={[-4.6, -1.3, NOSE + 1.3]} b={[1.6, -0.75, NOSE + 1.36]} />
-      <Block a={[LEFT, -0.5, NOSE + 0.6]} b={[LEFT + 2.6, 0.3, NOSE + 1.2]} color={PLASTIC} />
-      <Block a={[RIGHT - 2.6, -0.5, NOSE + 0.6]} b={[RIGHT, 0.3, NOSE + 1.2]} color={PLASTIC} />
+      <Block a={[LEFT, -2.6, NOSE + 1.4]} b={[RIGHT, -0.6, NOSE + 2.1]} />
+      <Block a={[mid - 3.4, -1.25, NOSE + 2.1]} b={[mid + 3.4, -0.85, NOSE + 2.16]} color={PLASTIC} />
+      <CylZ z={[NOSE + 2.16, NOSE + 2.2]} x={mid} y={-1.05} r={0.3} />
+      <Block a={[LEFT, -0.6, NOSE + 0.5]} b={[LEFT + 1.6, 0.25, NOSE + 2.0]} color={PLASTIC} />
+      <Block a={[RIGHT - 1.6, -0.6, NOSE + 0.5]} b={[RIGHT, 0.25, NOSE + 2.0]} color={PLASTIC} />
       {/* Open hood and the windshield behind it */}
-      <Panel hinge={[0, 0.9, FIREWALL]} x={[LEFT, RIGHT]} length={8.2} angle={1.05} toward={1} />
-      <Panel hinge={[0, 0.9, FIREWALL - 0.5]} x={[LEFT + 0.6, RIGHT - 0.6]} length={4.5} angle={0.55} toward={-1} />
+      <Panel hinge={[mid, 0.9, FIREWALL]} x={[LEFT - mid, RIGHT - mid]} length={8.6} angle={1.05} toward={1} />
+      <Panel hinge={[mid, 0.9, FIREWALL - 0.9]} x={[LEFT - mid + 0.6, RIGHT - mid - 0.6]} length={4.5} angle={0.55} toward={-1} />
     </>
   )
 }
 
+/** Engine: the ribbed plastic cover with the oil cap on top, and the heat shield in front of it. */
 function Engine() {
   const rings = [-2.3, -2.16, -2.02, -1.88]
+  const ribs = [-6.1, -5.3, -4.5, -3.7, -2.95]
   return (
     <>
-      <Block a={[-6.6, -1.4, -1.7]} b={[-2.5, 0.2, 3.4]} />
-      <Block a={[-6.2, 0.2, -1.2]} b={[-2.9, 0.38, 2.6]} />
-      <CylY y={[0.38, 0.52]} x={-4.6} z={1.6} r={0.24} />
+      <Block a={[-7.2, -1.6, -1.5]} b={[-2.5, -0.1, 3.4]} />
+      <Block a={[-6.7, -0.1, -1.1]} b={[-2.5, 0.3, 1.2]} color={PLASTIC} />
+      {ribs.map((x) => (
+        <Block key={x} a={[x - 0.22, 0.3, -0.7]} b={[x + 0.22, 0.4, 0.2]} color={PLASTIC} />
+      ))}
+      <CylY y={[0.3, 0.5]} x={-4.1} z={0.75} r={0.2} />
+      <Block a={[-5.3, -0.1, 1.5]} b={[-3.5, 0.05, 3.1]} />
       {/* Hose from the air box to the engine */}
       <CylX x={[-2.5, -1.74]} y={0.52} z={-0.3} r={0.33} />
       {rings.map((x) => (
@@ -189,9 +218,9 @@ function Engine() {
 function Battery() {
   return (
     <>
-      <Block a={[1.2, -1.7, 1.9]} b={[3.7, -0.15, 3.9]} />
-      <CylY y={[-0.15, 0]} x={1.6} z={2.3} r={0.11} />
-      <CylY y={[-0.15, 0]} x={3.3} z={2.3} r={0.11} />
+      <Block a={[-0.2, -1.7, 1.9]} b={[2.0, -0.15, 3.7]} />
+      <Block a={[-0.05, -0.15, 2.3]} b={[0.45, 0.0, 3.3]} color={PLASTIC} />
+      <CylY y={[-0.15, -0.02]} x={1.65} z={2.3} r={0.11} />
     </>
   )
 }
@@ -199,8 +228,8 @@ function Battery() {
 function FuseBox() {
   return (
     <>
-      <Block a={[2.1, -1.0, -1.3]} b={[4.5, 0.2, 1.2]} />
-      <Block a={[2.2, 0.2, -1.2]} b={[4.4, 0.32, 1.1]} color={PLASTIC} />
+      <Block a={[2.15, -1.0, -1.6]} b={[3.55, 0.2, 1.3]} />
+      <Block a={[2.2, 0.2, -1.55]} b={[3.5, 0.32, 1.25]} color={PLASTIC} />
     </>
   )
 }
@@ -208,8 +237,17 @@ function FuseBox() {
 function Reservoir() {
   return (
     <>
-      <CylY y={[-0.4, 0.45]} x={1.1} z={-2.05} r={0.45} />
-      <CylY y={[0.45, 0.6]} x={1.1} z={-2.05} r={0.3} color="#f2c230" />
+      <CylY y={[-0.4, 0.45]} x={1.25} z={-2.1} r={0.42} />
+      <CylY y={[0.45, 0.6]} x={1.25} z={-2.1} r={0.28} color="#f2c230" />
+    </>
+  )
+}
+
+function Washer() {
+  return (
+    <>
+      <CylY y={[-0.6, 0.1]} x={LEFT + 1.0} z={1.3} r={0.32} />
+      <CylY y={[0.1, 0.24]} x={LEFT + 1.0} z={1.3} r={0.36} color="#4a9be0" />
     </>
   )
 }
@@ -232,6 +270,9 @@ export const AirBox = memo(function AirBox() {
       </Part>
       <Part id="reservoir">
         <Reservoir />
+      </Part>
+      <Part id="washer">
+        <Washer />
       </Part>
       <Part id="propRod">
         <CylX x={[rodPivot[0], rodPivot[0] + 3.8]} y={rodPivot[1]} z={rodPivot[2]} r={0.035} />
