@@ -54,6 +54,8 @@ export interface Step {
   specs?: Spec[]
   highlight?: string[]
   camera: { pos: Vec3; target: Vec3 }
+  /** Close-up shown in the round inset: what to look at, how wide (scene units), and a caption. */
+  detail?: { target: Vec3; span: number; label: string }
   /** Seconds the animation takes. */
   duration?: number
   actions: Action[]
@@ -67,6 +69,8 @@ export interface Procedure {
   tools: { name: string; detail?: string }[]
   supplies: { name: string; detail?: string }[]
   specs: Spec[]
+  /** Display name for each part id, used for the on-model labels. */
+  partNames: Record<string, string>
   /** Applied instantly before step one to put parts in their starting state. */
   setup: Action[]
   steps: Step[]

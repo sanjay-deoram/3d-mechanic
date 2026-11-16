@@ -89,6 +89,25 @@ export const civicSi2013FrontPads: Procedure = {
     { name: 'Gloves, safety glasses and a dust mask' },
   ],
   specs: [LUG_TORQUE, FLANGE_TORQUE, FLUID],
+  partNames: {
+    ...Object.fromEntries(LUGS.map((id) => [id, 'Lug nut'])),
+    wheel: 'Wheel',
+    caliper: 'Caliper',
+    piston: 'Caliper piston',
+    flangeBolt: 'Flange bolt',
+    springUpper: 'Return spring',
+    springLower: 'Return spring',
+    retainerUpper: 'Pad retainer',
+    retainerLower: 'Pad retainer',
+    padOuterOld: 'Worn pad',
+    padInnerOld: 'Worn pad',
+    shimOuterOld: 'Shim',
+    shimInnerOld: 'Shim',
+    padOuterNew: 'New pad',
+    padInnerNew: 'New pad',
+    shimOuterNew: 'Shim',
+    shimInnerNew: 'Shim',
+  },
   setup: [
     { type: 'move', parts: ['caliper', 'flangeBolt'], by: [-WEAR, 0, 0] },
     { type: 'move', parts: ['piston'], by: [WEAR, 0, 0] },
@@ -115,6 +134,7 @@ export const civicSi2013FrontPads: Procedure = {
       tools: ['19 mm socket', 'Breaker bar'],
       notes: [{ kind: 'tip', text: 'The tyre on the ground stops the wheel spinning while you push.' }],
       highlight: LUGS,
+      detail: { target: lugCenter(0), span: 1.5, label: '5× lug nut · 19 mm' },
       camera: VIEW.wheel,
       duration: 6,
       actions: STAR.map(
@@ -155,6 +175,7 @@ export const civicSi2013FrontPads: Procedure = {
       body: 'Spin all five lug nuts off and set them somewhere they will not roll away.',
       tools: ['19 mm socket', 'Ratchet'],
       highlight: LUGS,
+      detail: { target: lugCenter(0), span: 1.5, label: '5× lug nut · 19 mm' },
       camera: VIEW.wheel,
       duration: 7,
       actions: STAR.flatMap((i, k): Action[] => [
@@ -193,6 +214,7 @@ export const civicSi2013FrontPads: Procedure = {
       tools: ['12 mm socket', 'Ratchet'],
       notes: [{ kind: 'tip', text: 'Turn the steering wheel so the caliper points outward and is easier to reach.' }],
       highlight: ['flangeBolt'],
+      detail: { target: wornBoltCenter, span: 1.5, label: 'Flange bolt · 12 mm' },
       camera: VIEW.bolt,
       duration: 4.5,
       actions: [
@@ -288,6 +310,7 @@ export const civicSi2013FrontPads: Procedure = {
       tools: ['Caliper piston compressor'],
       notes: [{ kind: 'tip', text: 'Watch the fluid reservoir as you go. If it nears the top, stop and draw more out.' }],
       highlight: ['piston'],
+      detail: { target: pistonFaceWhenRaised(), span: 1.7, label: 'Press the piston flush' },
       camera: VIEW.raised,
       duration: 4,
       actions: [
@@ -334,6 +357,7 @@ export const civicSi2013FrontPads: Procedure = {
       tools: ['12 mm socket', 'Torque wrench'],
       specs: [FLANGE_TORQUE],
       highlight: ['caliper', 'flangeBolt'],
+      detail: { target: lowerBoltCenter, span: 1.5, label: '25 lbf·ft (34 N·m)' },
       camera: VIEW.bolt,
       duration: 7,
       actions: [
@@ -406,6 +430,7 @@ export const civicSi2013FrontPads: Procedure = {
       tools: ['19 mm socket', 'Torque wrench'],
       specs: [LUG_TORQUE],
       highlight: LUGS,
+      detail: { target: lugCenter(0), span: 1.5, label: '80 lbf·ft (108 N·m)' },
       camera: VIEW.wheel,
       duration: 7,
       actions: STAR.map(

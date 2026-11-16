@@ -34,40 +34,33 @@ function Part({ id, children }: { id: string; children: ReactNode }) {
 
 interface Look {
   color: string
-  metalness?: number
-  roughness?: number
 }
 
+/** Paper tones: the scene is drawn as line art, so parts differ in tone only where it helps. */
+const WHITE: Look = { color: '#ffffff' }
 const LOOK = {
-  rotor: { color: '#b9bec5', metalness: 0.9, roughness: 0.28 },
-  rotorCast: { color: '#565b62', metalness: 0.6, roughness: 0.75 },
-  iron: { color: '#5d646e', metalness: 0.55, roughness: 0.62 },
-  caliper: { color: '#8a9099', metalness: 0.55, roughness: 0.58 },
-  bracket: { color: '#4c5159', metalness: 0.5, roughness: 0.68 },
-  backing: { color: '#2b2e33', metalness: 0.5, roughness: 0.6 },
-  wornFriction: { color: '#3d3530', metalness: 0.1, roughness: 0.95 },
-  newFriction: { color: '#6b5846', metalness: 0.1, roughness: 0.9 },
-  shim: { color: '#aeb4bc', metalness: 0.8, roughness: 0.35 },
-  clip: { color: '#d5d9df', metalness: 0.85, roughness: 0.3 },
-  chrome: { color: '#e4e7ea', metalness: 0.95, roughness: 0.15 },
-  bolt: { color: '#c2a868', metalness: 0.8, roughness: 0.35 },
-  piston: { color: '#d3d8de', metalness: 0.92, roughness: 0.2 },
-  rubber: { color: '#17181b', metalness: 0, roughness: 0.9 },
-  wheel: { color: '#c3c8ce', metalness: 0.75, roughness: 0.32 },
-  wheelDark: { color: '#3a3e45', metalness: 0.6, roughness: 0.5 },
-  chassis: { color: '#33373d', metalness: 0.4, roughness: 0.7 },
-  shield: { color: '#26292e', metalness: 0.5, roughness: 0.7 },
+  rotor: WHITE,
+  rotorCast: WHITE,
+  iron: WHITE,
+  caliper: WHITE,
+  bracket: WHITE,
+  backing: { color: '#f1f0ec' },
+  wornFriction: { color: '#b9b6ae' },
+  newFriction: { color: '#d8d5cd' },
+  shim: WHITE,
+  clip: WHITE,
+  chrome: WHITE,
+  bolt: WHITE,
+  piston: WHITE,
+  rubber: { color: '#e7e5de' },
+  wheel: WHITE,
+  wheelDark: { color: '#f1f0ec' },
+  chassis: WHITE,
+  shield: WHITE,
 } satisfies Record<string, Look>
 
 function Mat({ look, double }: { look: Look; double?: boolean }) {
-  return (
-    <meshStandardMaterial
-      color={look.color}
-      metalness={look.metalness ?? 0.5}
-      roughness={look.roughness ?? 0.5}
-      side={double ? DoubleSide : undefined}
-    />
-  )
+  return <meshBasicMaterial color={look.color} side={double ? DoubleSide : undefined} />
 }
 
 /* ---------- primitives ---------- */

@@ -2,9 +2,9 @@ import { forwardRef } from 'react'
 import type { Group } from 'three'
 import type { ToolKind } from '../types'
 
-const steel = { color: '#e3e6ea', metalness: 0.95, roughness: 0.2 }
-const dark = { color: '#1c1d21', metalness: 0.2, roughness: 0.8 }
-const accent = { color: '#ff7a1a', metalness: 0.2, roughness: 0.6 }
+const steel = { color: '#ffffff' }
+const dark = { color: '#dddbd3' }
+const accent = { color: '#e6502e' }
 
 const HANDLE: Record<Exclude<ToolKind, 'compressor'>, number> = { ratchet: 2, breaker: 2.9, torque: 3.1 }
 
@@ -15,7 +15,7 @@ function CylX({ x, r, mat, segments = 24 }: { x: [number, number]; r: number; ma
   return (
     <mesh position={[(x[0] + x[1]) / 2, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
       <cylinderGeometry args={[r, r, x[1] - x[0], segments]} />
-      <meshStandardMaterial {...mat} />
+      <meshBasicMaterial {...mat} />
     </mesh>
   )
 }
@@ -30,16 +30,16 @@ function Wrench({ kind }: { kind: Exclude<ToolKind, 'compressor'> }) {
       <CylX x={[0.58, 0.78]} r={0.19} mat={steel} />
       <mesh position={[0.68, length / 2, 0]}>
         <cylinderGeometry args={[0.055, 0.075, length, 16]} />
-        <meshStandardMaterial {...steel} />
+        <meshBasicMaterial {...steel} />
       </mesh>
       <mesh position={[0.68, length - 0.45, 0]}>
         <cylinderGeometry args={[0.1, 0.1, 0.9, 20]} />
-        <meshStandardMaterial {...grip} />
+        <meshBasicMaterial {...grip} />
       </mesh>
       {kind === 'torque' && (
         <mesh position={[0.68, 0.6, 0]}>
           <cylinderGeometry args={[0.11, 0.11, 0.32, 20]} />
-          <meshStandardMaterial {...dark} />
+          <meshBasicMaterial {...dark} />
         </mesh>
       )}
     </>
@@ -52,23 +52,23 @@ function Compressor() {
     <>
       <mesh position={[0.02, 0, 0]}>
         <boxGeometry args={[0.04, 0.5, 0.62]} />
-        <meshStandardMaterial {...steel} />
+        <meshBasicMaterial {...steel} />
       </mesh>
       <mesh position={[0.42, 0, 0]}>
         <boxGeometry args={[0.04, 0.5, 0.62]} />
-        <meshStandardMaterial {...steel} />
+        <meshBasicMaterial {...steel} />
       </mesh>
       <CylX x={[0.44, 0.62]} r={0.1} mat={steel} />
       <group name={SPINNER}>
         <CylX x={[0.04, 1.15]} r={0.045} mat={dark} />
         <mesh position={[1.1, 0, 0]}>
           <cylinderGeometry args={[0.03, 0.03, 1.1, 12]} />
-          <meshStandardMaterial {...steel} />
+          <meshBasicMaterial {...steel} />
         </mesh>
         {[0.55, -0.55].map((y) => (
           <mesh key={y} position={[1.1, y, 0]}>
             <sphereGeometry args={[0.09, 20, 14]} />
-            <meshStandardMaterial {...accent} />
+            <meshBasicMaterial {...accent} />
           </mesh>
         ))}
       </group>
